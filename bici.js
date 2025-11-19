@@ -25,7 +25,7 @@ function setup() {
   angleMode(DEGREES);
   cx = width / 2;
   cy = height / 2;
-  marginRect = min(width, height) * 0.05; // 5% del tamaño menor de la pantalla
+  marginRect = min(width, height) * 0.15; // 15% del tamaño menor
   resetWheelPositions();
 }
 
@@ -62,18 +62,19 @@ function draw() {
   let pedal = {x: pedalCenterX, y: pedalCenterY, vx: pedalVX, vy: pedalVY};
   let seat = {x: seatX, y: seatY, vx: seatVX, vy: seatVY};
 
+  // Movimientos respetando tamaños y escalas
   move(rear, rear.vx, rear.vy,
-       -width/2 + rearR + marginRect/2, width/2 - rearR - marginRect/2,
-       -height/2 + rearR + marginRect/2, height/2 - rearR - marginRect/2);
+       -width/2 + rearR*bikeScale + marginRect/2, width/2 - rearR*bikeScale - marginRect/2,
+       -height/2 + rearR*bikeScale + marginRect/2, height/2 - rearR*bikeScale - marginRect/2);
   move(front, front.vx, front.vy,
-       -width/2 + frontR + marginRect/2, width/2 - frontR - marginRect/2,
-       -height/2 + frontR + marginRect/2, height/2 - frontR - marginRect/2);
+       -width/2 + frontR*bikeScale + marginRect/2, width/2 - frontR*bikeScale - marginRect/2,
+       -height/2 + frontR*bikeScale + marginRect/2, height/2 - frontR*bikeScale - marginRect/2);
   move(pedal, pedal.vx, pedal.vy,
-       -width/2 + marginRect/2, width/2 - marginRect/2,
-       -height/2 + marginRect/2, height/2 - marginRect/2);
+       -width/2 + pedalSize*bikeScale*20 + marginRect/2, width/2 - pedalSize*bikeScale*20 - marginRect/2,
+       -height/2 + pedalSize*bikeScale*20 + marginRect/2, height/2 - pedalSize*bikeScale*20 - marginRect/2);
   move(seat, seat.vx, seat.vy,
-       -width/2 + marginRect/2, width/2 - marginRect/2,
-       -height/2 + marginRect/2, height/2 - marginRect/2);
+       -width/2 + seatSize*bikeScale*35 + marginRect/2, width/2 - seatSize*bikeScale*35 - marginRect/2,
+       -height/2 + seatSize*bikeScale*20 + marginRect/2, height/2 - seatSize*bikeScale*20 - marginRect/2);
 
   rearX = rear.x; rearY = rear.y; rearVX = rear.vx; rearVY = rear.vy;
   frontX = front.x; frontY = front.y; frontVX = front.vx; frontVY = front.vy;
@@ -96,7 +97,8 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   cx = width / 2;
   cy = height / 2;
-  marginRect = min(width, height) * 0.05;
+  marginRect = min(width, height) * 0.15; // 15%
+  resetWheelPositions();
 }
 
 // --- Funciones de dibujo ---
@@ -198,17 +200,17 @@ function resetWheelPositions() {
   rearR = random(min(width, height) * 0.08, min(width, height) * 0.15);
   frontR = random(min(width, height) * 0.1, min(width, height) * 0.2);
 
-  rearX = random(-width / 2 + rearR + marginRect / 2, width / 2 - rearR - marginRect / 2);
-  rearY = random(-height / 2 + rearR + marginRect / 2, height / 2 - rearR - marginRect / 2);
+  rearX = random(-width/2 + rearR*bikeScale + marginRect, width/2 - rearR*bikeScale - marginRect);
+  rearY = random(-height/2 + rearR*bikeScale + marginRect, height/2 - rearR*bikeScale - marginRect);
 
-  frontX = random(-width / 2 + frontR + marginRect / 2, width / 2 - frontR - marginRect / 2);
-  frontY = random(-height / 2 + frontR + marginRect / 2, height / 2 - frontR - marginRect / 2);
+  frontX = random(-width/2 + frontR*bikeScale + marginRect, width/2 - frontR*bikeScale - marginRect);
+  frontY = random(-height/2 + frontR*bikeScale + marginRect, height/2 - frontR*bikeScale - marginRect);
 
-  seatX = random(-width / 2 + marginRect / 2, width / 2 - marginRect / 2);
-  seatY = random(-height / 2 + marginRect / 2, height / 2 - marginRect / 2);
+  seatX = random(-width/2 + seatSize*bikeScale*35 + marginRect, width/2 - seatSize*bikeScale*35 - marginRect);
+  seatY = random(-height/2 + seatSize*bikeScale*20 + marginRect, height/2 - seatSize*bikeScale*20 - marginRect);
 
-  pedalCenterX = random(-width / 2 + marginRect / 2, width / 2 - marginRect / 2);
-  pedalCenterY = random(-height / 2 + marginRect / 2, height / 2 - marginRect / 2);
+  pedalCenterX = random(-width/2 + pedalSize*bikeScale*20 + marginRect, width/2 - pedalSize*bikeScale*20 - marginRect);
+  pedalCenterY = random(-height/2 + pedalSize*bikeScale*20 + marginRect, height/2 - pedalSize*bikeScale*20 - marginRect);
 
   rearVX = random(1, 3); rearVY = random(1, 3);
   frontVX = random(1, 3); frontVY = random(1, 3);
