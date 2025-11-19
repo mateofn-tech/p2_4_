@@ -17,14 +17,15 @@ let seatSize = 1;
 let pedalSize = 1;
 let handleScale = 1;
 
-const marginRect = 189; // 5 cm aprox.
+let marginRect; // margen dinámico basado en porcentaje
 const pinkColor = [255, 0, 255]; // rosa del fondo y rectángulo
 
 function setup() {
-  createCanvas(1920, 1080);
+  createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
   cx = width / 2;
   cy = height / 2;
+  marginRect = min(width, height) * 0.05; // 5% del tamaño menor de la pantalla
   resetWheelPositions();
 }
 
@@ -37,7 +38,7 @@ function draw() {
   stroke(pinkColor);
   strokeWeight(marginRect);
   rectMode(CORNER);
-  rect(0 + marginRect / 2, 0 + marginRect / 2, width - marginRect, height - marginRect);
+  rect(marginRect / 2, marginRect / 2, width - marginRect, height - marginRect);
   pop();
 
   push();
@@ -48,30 +49,30 @@ function draw() {
   let rearYOffset = sin(angle) * oscillationAmplitude;
   let frontYOffset = sin(angle + 180) * oscillationAmplitude;
 
-  const margin = 20;
-
   // --- Mover los elementos continuamente ---
   function move(obj, vx, vy, minX, maxX, minY, maxY) {
     obj.x += vx;
     obj.y += vy;
-    // Rebote al llegar al límite
     if (obj.x < minX || obj.x > maxX) obj.vx *= -1;
     if (obj.y < minY || obj.y > maxY) obj.vy *= -1;
   }
 
-  // Crear objetos
   let rear = {x: rearX, y: rearY, vx: rearVX, vy: rearVY};
   let front = {x: frontX, y: frontY, vx: frontVX, vy: frontVY};
   let pedal = {x: pedalCenterX, y: pedalCenterY, vx: pedalVX, vy: pedalVY};
   let seat = {x: seatX, y: seatY, vx: seatVX, vy: seatVY};
 
-  move(rear, rear.vx, rear.vy, -width/2 + rearR + marginRect/2, width/2 - rearR - marginRect/2,
+  move(rear, rear.vx, rear.vy,
+       -width/2 + rearR + marginRect/2, width/2 - rearR - marginRect/2,
        -height/2 + rearR + marginRect/2, height/2 - rearR - marginRect/2);
-  move(front, front.vx, front.vy, -width/2 + frontR + marginRect/2, width/2 - frontR - marginRect/2,
+  move(front, front.vx, front.vy,
+       -width/2 + frontR + marginRect/2, width/2 - frontR - marginRect/2,
        -height/2 + frontR + marginRect/2, height/2 - frontR - marginRect/2);
-  move(pedal, pedal.vx, pedal.vy, -width/2 + marginRect/2, width/2 - marginRect/2,
+  move(pedal, pedal.vx, pedal.vy,
+       -width/2 + marginRect/2, width/2 - marginRect/2,
        -height/2 + marginRect/2, height/2 - marginRect/2);
-  move(seat, seat.vx, seat.vy, -width/2 + marginRect/2, width/2 - marginRect/2,
+  move(seat, seat.vx, seat.vy,
+       -width/2 + marginRect/2, width/2 - marginRect/2,
        -height/2 + marginRect/2, height/2 - marginRect/2);
 
   rearX = rear.x; rearY = rear.y; rearVX = rear.vx; rearVY = rear.vy;
@@ -79,17 +80,11 @@ function draw() {
   pedalCenterX = pedal.x; pedalCenterY = pedal.y; pedalVX = pedal.vx; pedalVY = pedal.vy;
   seatX = seat.x; seatY = seat.y; seatVX = seat.vx; seatVY = seat.vy;
 
-  // Dibujar ruedas
+  // Dibujar elementos
   drawWheel(rearX, rearY + rearYOffset, rearR, angle, true, false, true);
   drawWheel(frontX, frontY + frontYOffset, frontR, -angle * 2, true, true, false);
-
-  // Cuadro
   drawFrame(rearX, rearY + rearYOffset, pedalCenterX, pedalCenterY, frontX, frontY + frontYOffset, seatX, seatY);
-
-  // Barra vertical manillar
   drawVerticalBarAndHandlebar(frontX, frontY + frontYOffset, frontR, pedalCenterX, pedalCenterY);
-
-  // Sillín y pedales
   drawSeat(seatX, seatY);
   drawPedals(pedalCenterX, pedalCenterY);
 
@@ -97,7 +92,14 @@ function draw() {
   angle += 4;
 }
 
-// --- Funciones de dibujo (mismo código que antes) ---
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  cx = width / 2;
+  cy = height / 2;
+  marginRect = min(width, height) * 0.05;
+}
+
+// --- Funciones de dibujo ---
 function drawWheel(x, y, r, rot, showCircle = true, showSpokes = true, repeatInside = false) {
   push();
   translate(x, y);
@@ -193,8 +195,8 @@ function drawPedals(px, py, crankLen = 22) {
 
 // --- Inicializar posiciones y velocidades ---
 function resetWheelPositions() {
-  rearR = random(80, 160);
-  frontR = random(100, 200);
+  rearR = random(min(width, height) * 0.08, min(width, height) * 0.15);
+  frontR = random(min(width, height) * 0.1, min(width, height) * 0.2);
 
   rearX = random(-width / 2 + rearR + marginRect / 2, width / 2 - rearR - marginRect / 2);
   rearY = random(-height / 2 + rearR + marginRect / 2, height / 2 - rearR - marginRect / 2);
@@ -208,7 +210,6 @@ function resetWheelPositions() {
   pedalCenterX = random(-width / 2 + marginRect / 2, width / 2 - marginRect / 2);
   pedalCenterY = random(-height / 2 + marginRect / 2, height / 2 - marginRect / 2);
 
-  // Velocidades iniciales
   rearVX = random(1, 3); rearVY = random(1, 3);
   frontVX = random(1, 3); frontVY = random(1, 3);
   pedalVX = random(1, 3); pedalVY = random(1, 3);
